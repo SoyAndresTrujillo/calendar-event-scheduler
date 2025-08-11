@@ -1,0 +1,11 @@
+{
+  "root": [
+    "./src/app.tsx",
+    "./src/main.tsx",
+    "./src/components/eventform.tsx",
+    "./src/types/style-modules.d.ts",
+    "./src/utils/urlbuilders.ts",
+    "./vite.config.ts"
+  ],
+  "version": "5.9.2"
+}
