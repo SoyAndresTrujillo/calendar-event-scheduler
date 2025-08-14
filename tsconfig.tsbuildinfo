@@ -1,11 +1,1 @@
-{
-  "root": [
-    "./src/app.tsx",
-    "./src/main.tsx",
-    "./src/components/eventform.tsx",
-    "./src/types/style-modules.d.ts",
-    "./src/utils/urlbuilders.ts",
-    "./vite.config.ts"
-  ],
-  "version": "5.9.2"
-}
+{"root":["./src/app.tsx","./src/main.tsx","./src/components/calendarapp.tsx","./src/components/eventform.tsx","./src/components/landingpage.tsx","./src/types/style-modules.d.ts","./src/utils/urlbuilders.ts","./vite.config.ts"],"version":"5.9.2"}

@@ -1,4 +1,4 @@
-import { CalendarOutlined, ClockCircleOutlined, LinkOutlined } from '@ant-design/icons';
+import { CalendarOutlined, CheckCircleTwoTone, ClockCircleOutlined, LinkOutlined } from '@ant-design/icons';
 import {
   Button,
   Col,
@@ -13,7 +13,7 @@ import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import utc from 'dayjs/plugin/utc';
-import { useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { buildGoogleCalendarUrl, buildOutlookCalendarUrl } from '../utils/urlBuilders';
 import styles from './EventForm.module.scss';
@@ -25,34 +25,41 @@ export type CalendarPlatform = 'google' | 'outlook';
 
 export interface EventFormValues {
   title: string;
-  startDate: Dayjs;
-  startTime: Dayjs;
   endDate: Dayjs;
   endTime: Dayjs;
+  startDate: Dayjs;
+  startTime: Dayjs;
   location?: string;
   description?: string;
   generatedUrl?: string;
 }
 
-const initialValues = {
-  startDate: null,
-  startTime: null,
-  endDate: null,
-  endTime: null,
-} as unknown as Partial<EventFormValues>;
+const initialValues: Partial<EventFormValues> = {};
 
 interface Props {
   platform: CalendarPlatform;
-  onGenerate: (values: EventFormValues) => void;
+  onGenerate: (values: EventFormValues) => Promise<boolean>;
 }
 
 export default function EventForm({ platform, onGenerate }: Props) {
+  console.log({ platform });
   const [form] = Form.useForm<EventFormValues>();
+  const [copied, setCopied] = useState(false);
+  const resetIconTimerRef = useRef<number | null>(null);
 
   useEffect(() => {
     // Clear previous generated URL when platform changes
     form.setFieldValue('generatedUrl', undefined);
+    setCopied(false);
   }, [platform, form]);
+
+  useEffect(() => {
+    return () => {
+      if (resetIconTimerRef.current) {
+        window.clearTimeout(resetIconTimerRef.current);
+      }
+    };
+  }, []);
 
   const requiredRule = (label: string) => ({ required: true, message: `${label} is required` });
 
@@ -102,7 +109,14 @@ export default function EventForm({ platform, onGenerate }: Props) {
       const values = await form.validateFields();
       const url = buildUrl(values);
       form.setFieldValue('generatedUrl', url);
-      onGenerate({ ...values, generatedUrl: url });
+      const success = await onGenerate({ ...values, generatedUrl: url });
+      if (success) {
+        setCopied(true);
+        if (resetIconTimerRef.current) {
+          window.clearTimeout(resetIconTimerRef.current);
+        }
+        resetIconTimerRef.current = window.setTimeout(() => setCopied(false), 3000);
+      }
     } catch {
       // Validation failed; do nothing
     }
@@ -187,7 +201,7 @@ export default function EventForm({ platform, onGenerate }: Props) {
         <Col xs={24} md={12}>
           <Form.Item name="description" label="Description (Optional)">
             <Input.TextArea
-              rows={3}
+              rows={1}
               maxLength={500}
               showCount
               placeholder="Add event details, agenda, or notes..."
@@ -198,22 +212,22 @@ export default function EventForm({ platform, onGenerate }: Props) {
 
       <Row gutter={12}>
         <Col>
-          <Button icon={<LinkOutlined />} onClick={onGenerateClick}>
-            Generate URL
+          <Button
+            icon={copied ? <CheckCircleTwoTone twoToneColor="#22C55E" /> : <LinkOutlined />}
+            onClick={onGenerateClick}
+          >
+            Copy URL to clipboard
           </Button>
         </Col>
         <Col>
           <Button type="primary" onClick={onSubmit}>
             Open in {platform === 'google' ? 'Google Calendar' : 'Outlook Calendar'}
           </Button>
-        </Col>
-      </Row>
-
-      <Row style={{ marginTop: 8 }}>
-        <Col span={24}>
-          <Typography.Text type="secondary">
-            Fields marked with * are required
-          </Typography.Text>
+          {platform === 'outlook' && (
+            <Typography.Text type="secondary" style={{ marginLeft: 8 }}>
+              Only works with Microsoft personal accounts
+            </Typography.Text>
+          )}
         </Col>
       </Row>
     </Form>
