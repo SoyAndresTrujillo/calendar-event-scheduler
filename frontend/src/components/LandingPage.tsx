@@ -63,6 +63,10 @@ const LandingPage: React.FC = () => {
           </div>
           <div className={styles.navLinks}>
             <button onClick={scrollToFeatures} className={styles.navLink}>Features</button>
+            <button className={styles.secondaryButton}>
+              <img src="/google-icon.svg" alt="Google" style={{ width: 16, height: 16, marginRight: 8 }} />
+              Sign In
+            </button>
           </div>
         </div>
       </nav>

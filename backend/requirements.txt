@@ -1,0 +1,28 @@
+# FastAPI and core dependencies
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+python-multipart==0.0.6
+
+# Security and authentication
+python-jose[cryptography]==3.3.0
+cryptography==41.0.7
+bcrypt==4.1.2
+
+# HTTP client for OAuth
+httpx==0.25.2
+
+# Environment and configuration
+python-decouple==3.8
+pydantic-settings==2.1.0
+email-validator==2.1.1
+
+# CORS support
+fastapi-cors==0.0.6
+
+# Development dependencies
+pytest==7.4.3
+pytest-asyncio==0.21.1
+black==23.11.0
+isort==5.12.0
+flake8==6.1.0
+
